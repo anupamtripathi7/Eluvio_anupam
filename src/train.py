@@ -3,15 +3,13 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import os
 from tqdm import tqdm
-from model import Net
-from movie_scenes import MovieScenes
-from utils import get_accuracy, Config
+from src.model import Net
+from src.movie_scenes import MovieScenes
+from src.utils import get_accuracy, Config
 from sklearn.metrics import classification_report, confusion_matrix
 
 
 conf = Config()
-conf.root = 'data'
-conf.results_path = 'results'
 conf.epochs = 500000
 conf.lr = 5e-5
 conf.window_size = 50
@@ -24,10 +22,20 @@ conf.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def train(train_loader, valid_loader, load_model=False):
+    """
+    Train a model on the given dataset
+    Args:
+        train_loader (DataLoader): Train set data loader
+        valid_loader (DataLoader): Validation set data loader
+        load_model (bool): If true, loads a pre-trained model
+
+    Returns:
+        (nn.module): Trained model
+    """
     criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([11]).to(conf.device))
     model = Net(conf).to(conf.device)
     if load_model:
-        model.load_state_dict(torch.load('model.pth'))
+        model.load_state_dict(torch.load(os.path.join(conf.root, 'results', 'model.pth'), map_location=torch.device('cpu')))
 
     # Optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=conf.lr)
@@ -88,7 +96,7 @@ def train(train_loader, valid_loader, load_model=False):
             print('##Valid##\n', confusion_matrix(y_true_valid.numpy().T, y_pred_valid.numpy().T, labels=[0, 1]))
             print(classification_report(y_true_valid.numpy().T, y_pred_valid.numpy().T), '\n\n\n')
         if epoch % 250 == 0:
-            torch.save(model.state_dict(), 'model_3.pth')
+            torch.save(model.state_dict(), os.path.join(conf.root, 'results', 'model.pth'))
 
 
 if __name__ == '__main__':
@@ -99,6 +107,6 @@ if __name__ == '__main__':
     train_size = int(conf.train_test_split_ratio * len(transformed_dataset))
     train_set, valid_set = torch.utils.data.random_split(transformed_dataset,
                                                          [train_size, len(transformed_dataset) - train_size])
-    train_loader, valid_loader = DataLoader(train_set, shuffle=False, batch_size=1), \
+    train_load, valid_load = DataLoader(train_set, shuffle=False, batch_size=1), \
                                  DataLoader(valid_set, shuffle=False, batch_size=1)
-    train(train_loader, valid_loader, True)
+    train(train_load, valid_load, True)

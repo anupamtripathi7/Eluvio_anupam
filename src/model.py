@@ -6,7 +6,7 @@ class Net(nn.Module):
     def __init__(self, conf):
         """
         Args:
-            classes (int): Number of classes for classification
+            conf (src.utils.Config): Config parameters class
         """
         super(Net, self).__init__()
 
@@ -16,8 +16,8 @@ class Net(nn.Module):
     def forward(self, x_dict):
         """
         Args:
-            x(tensor): Input sentence of size (batch size, c, h, w)
-        Returns: Output Tensor of size (batch size, n_classes)
+            x_dict(dict): Dictionary with all inputs in tensor format
+        Returns: Output Tensor of size (batch size, n_clips-1)
         """
         out = []
         for key in ['place', 'action', 'audio', 'cast']:

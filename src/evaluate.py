@@ -2,12 +2,14 @@ import torch
 from torch.utils.data import DataLoader
 import json
 import numpy as np
-from movie_scenes import MovieScenes
-from model import Net
+from src.movie_scenes import MovieScenes
+from src.model import Net
 from sklearn.metrics import average_precision_score
+from src.utils import Config
+import os
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-window_size = 50                    # set the same as saved model
+
+conf = Config()
 
 
 def evaluate_model(model, dataset):
@@ -17,7 +19,7 @@ def evaluate_model(model, dataset):
     for n, sample in enumerate(dataloader):
         with torch.no_grad():
             for key in ['place', 'action', 'audio', 'cast', 'scene_transition_boundary_ground_truth', 'shot_end_frame']:
-                sample[key] = sample[key].to(device)
+                sample[key] = sample[key].to(conf.device)
             out = model(sample)
         sigmoid_out = torch.sigmoid(out)
         gt_dict[sample["imdb_id"][0]] = sample["scene_transition_boundary_ground_truth"].cpu()[0]
@@ -170,8 +172,8 @@ def calc_precision_recall(gt_dict, pr_dict, threshold=0.5):
 if __name__ == '__main__':
     compose = None
     print("Extracting Dataset")
-    transformed_dataset = MovieScenes(window_size=window_size, transform=compose)
+    transformed_dataset = MovieScenes(window_size=conf.window_size, transform=compose)
     print("Dataset loading done!\n")
-    model = Net().to(device)
-    model.load_state_dict(torch.load('model_3.pth'))
+    model = Net(conf).to(conf.device)
+    model.load_state_dict(torch.load(os.path.join(conf.root, 'results', 'model.pth'), map_location=torch.device('cpu')))
     evaluate_model(model, transformed_dataset)

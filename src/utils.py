@@ -1,11 +1,14 @@
 import torch
 import torch.nn as nn
+import os
 
 
 class Config:
+
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.root = 'data'
+        self.root = '../'
+        self.data_path = os.path.join(self.root, 'data')
         self.results_path = 'results'
         self.epochs = 500000
         self.lr = 5e-5

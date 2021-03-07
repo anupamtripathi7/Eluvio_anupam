@@ -1,15 +1,14 @@
 import os
 import torch
 from torch.utils.data import Dataset, DataLoader
-from utils import cosine_similarity_for_window
+from src.utils import cosine_similarity_for_window
 import pandas as pd
 from tqdm import tqdm
 import pickle
 import glob
-from utils import Config
+from src.utils import Config
 
 
-data_path = 'data'
 root = '../'
 split = 0.8
 conf = Config()
@@ -19,7 +18,7 @@ class MovieScenes(Dataset):
 
     def __init__(self, window_size, transform=None):
         self.transform = transform
-        # imdb_df = pd.read_csv(os.path.join(data_path, 'title.basics.tsv'), sep='\t', index_col='tconst')
+        # imdb_df = pd.read_csv(os.path.join(conf.data_path, 'title.basics.tsv'), sep='\t', index_col='tconst')
         # genre_idx = list(imdb_df.columns).index('genres')
 
         self.data = {'place': [],
@@ -30,7 +29,7 @@ class MovieScenes(Dataset):
                      'shot_end_frame': [],
                      'scene_transition_boundary_prediction': [],
                      'imdb_id': []}
-        for n, file in tqdm(enumerate(glob.glob(os.path.join(data_path, 'data/*.pkl')))):
+        for n, file in tqdm(enumerate(glob.glob(os.path.join(conf.data_path, 'data/*.pkl')))):
             with open(file, 'rb') as f:
                 pkl_data = pickle.load(f)
             for key, value in self.data.items():
