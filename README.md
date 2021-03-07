@@ -17,6 +17,7 @@ c'i = abs(ci - ci+1)
 Where ci is the ith row of the original feature matrix, thus converting a c x f matrix to c x 1. 
 Now this is by considering just one nearby clip. 
 By considering k neighboring clips, we get a resultant feature matrix of c x k by having padding wherever necessary. 
+<br>
 c'i = [abs(ci - ci-k/2), abs(ci - ci-k/2+1), ... abs(ci - ci+k/2-1), abs(ci - ci+k/2)]
 <br>
 With 4 such matrices, we get a resultant feature matrix of c x 4*k, which is passed through an LSTM to get the resultant predictions
