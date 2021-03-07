@@ -10,7 +10,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 
 conf = Config()
-conf.epochs = 500000
+conf.epochs = 5000
 conf.lr = 5e-5
 conf.window_size = 50
 conf.lstm_layers = 4

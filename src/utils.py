@@ -10,7 +10,7 @@ class Config:
         self.root = '../'
         self.data_path = os.path.join(self.root, 'data')
         self.results_path = 'results'
-        self.epochs = 500000
+        self.epochs = 5000
         self.lr = 5e-5
         self.window_size = 50
         self.lstm_layers = 4
